@@ -3,156 +3,208 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Creative Manager App</title>
+  <title>デザインマネージャー | クリエイティブ管理</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <header class="hero">
-    <div>
-      <p class="eyebrow">Creative Designer Company</p>
-      <h1>業務管理WEBアプリ</h1>
-      <p class="lead">発注内容の読込、納期判定、外注判断、通知文面作成までをひとつにまとめた、GitHub Pagesで動くシンプル版です。</p>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✦</div>
+        <div>
+          <div class="brand-title">デザインマネージャー</div>
+          <div class="brand-sub">クリエイティブ管理</div>
+        </div>
+      </div>
+
+      <nav class="nav">
+        <button class="nav-item active" data-page="dashboard">ダッシュボード</button>
+        <button class="nav-item" data-page="orders">受注管理</button>
+        <button class="nav-item" data-page="templates">テンプレート</button>
+        <button class="nav-item" data-page="staff">スタッフ</button>
+        <button class="nav-item" data-page="reports">日程</button>
+        <button class="nav-item" data-page="outsource">外注管理</button>
+      </nav>
+
+      <div class="sidebar-footer">デザインマネージャー v1.0</div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div id="pageTitle">ダッシュボード</div>
+        <div class="topbar-actions">
+          <button class="btn btn-secondary" id="sampleBtn">サンプル案件作成</button>
+          <button class="btn btn-primary" id="openOrderModalBtn">新規受注</button>
+        </div>
+      </header>
+
+      <section class="page active" id="dashboardPage">
+        <div class="page-head">
+          <h1>ダッシュボード</h1>
+          <p>案件の概要と進捗状況</p>
+        </div>
+
+        <div class="stats-grid">
+          <div class="stat-card"><span>すべてのプロジェクト</span><strong id="statTotal">0</strong><small>登録済み</small></div>
+          <div class="stat-card"><span>進行中</span><strong id="statActive">0</strong><small>アクティブ</small></div>
+          <div class="stat-card"><span>納期NG</span><strong id="statNg">0</strong><small>要対応</small></div>
+          <div class="stat-card"><span>外注候補</span><strong id="statOutsource">0</strong><small>AI判定</small></div>
+          <div class="stat-card"><span>スタッフ</span><strong id="statStaff">5</strong><small>稼働中</small></div>
+        </div>
+
+        <div class="dashboard-grid">
+          <div class="card">
+            <div class="card-title">最近の受注</div>
+            <div id="recentOrders" class="empty-box">受注データなし</div>
+          </div>
+          <div class="card settings-card">
+            <div class="card-title">運用設定</div>
+            <label class="field-block">
+              <span>会社名</span>
+              <input type="text" id="companyName" value="チャッピー株式会社" />
+            </label>
+            <label class="switch-row"><span>通知文面の自動生成</span><input type="checkbox" id="autoMail" checked /></label>
+            <label class="switch-row"><span>外注自動判定</span><input type="checkbox" id="autoOutsource" checked /></label>
+            <div class="settings-actions">
+              <button class="btn btn-secondary" id="resetDataBtn">データ初期化</button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="page" id="ordersPage">
+        <div class="page-head">
+          <h1>受注管理</h1>
+          <p>テンプレートから新規受注を登録</p>
+        </div>
+
+        <div class="toolbar">
+          <input type="text" id="orderSearch" placeholder="お客様名・案件名・受注番号で検索..." />
+          <select id="orderStatusFilter">
+            <option value="all">すべて</option>
+            <option value="納期OK">納期OK</option>
+            <option value="納期NG">納期NG</option>
+          </select>
+        </div>
+
+        <div class="table-card">
+          <table>
+            <thead>
+              <tr>
+                <th>受注番号</th>
+                <th>顧客</th>
+                <th>案件名</th>
+                <th>カテゴリ</th>
+                <th>担当者</th>
+                <th>予定</th>
+                <th>判定</th>
+                <th>ステータス</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+              <tr><td colspan="9" class="empty-cell">データなし</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="page" id="templatesPage">
+        <div class="page-head">
+          <h1>テンプレート</h1>
+          <p>発注テンプレートの管理</p>
+        </div>
+        <div id="templatesGrid" class="card-grid"></div>
+      </section>
+
+      <section class="page" id="staffPage">
+        <div class="page-head">
+          <h1>スタッフ</h1>
+          <p>担当者の管理と稼働状況</p>
+        </div>
+        <div id="staffGrid" class="card-grid"></div>
+      </section>
+
+      <section class="page" id="reportsPage">
+        <div class="page-head">
+          <h1>日程</h1>
+          <p>業務内容から自動生成された作業日程一覧</p>
+        </div>
+        <div id="reportsList" class="stack-list empty-box">日程はまだありません</div>
+      </section>
+
+      <section class="page" id="outsourcePage">
+        <div class="page-head">
+          <h1>外注管理</h1>
+          <p>外注指示書管理・送信</p>
+        </div>
+        <div id="outsourceList" class="stack-list empty-box">外注依頼はまだありません</div>
+      </section>
+    </main>
+  </div>
+
+  <div class="modal-overlay hidden" id="orderModal">
+    <div class="modal modal-wide">
+      <div class="modal-header">
+        <h2>新規受注登録</h2>
+        <button class="icon-btn" id="closeOrderModal">✕</button>
+      </div>
+      <div class="modal-body two-col">
+        <div>
+          <div class="tab-row">
+            <button class="tab active" data-order-tab="manual">手入力</button>
+            <button class="tab" data-order-tab="auto">発注書から自動入力</button>
+          </div>
+
+          <div id="manualTab" class="tab-panel active">
+            <div class="form-grid">
+              <label><span>顧客名 *</span><input type="text" id="client" /></label>
+              <label><span>顧客メール *</span><input type="email" id="clientEmail" /></label>
+              <label><span>案件名 *</span><input type="text" id="projectName" /></label>
+              <label><span>優先度</span>
+                <select id="priority">
+                  <option value="通常">通常</option>
+                  <option value="高">高</option>
+                  <option value="特急">特急</option>
+                </select>
+              </label>
+              <label><span>テンプレート *</span>
+                <select id="templateId"></select>
+              </label>
+              <label><span>受注金額</span><input type="number" id="amount" /></label>
+              <label><span>納品形式</span><input type="text" id="deliverable" value="AI / PSD / PNG" /></label>
+              <label><span>修正回数</span><input type="text" id="revisionCount" value="2" /></label>
+              <label class="full"><span>発注詳細</span><textarea id="details"></textarea></label>
+              <label><span>納期 *</span><input type="date" id="deadline" /></label>
+              <label><span>社内メモ</span><input type="text" id="memo" /></label>
+            </div>
+          </div>
+
+          <div id="autoTab" class="tab-panel">
+            <div class="upload-box">
+              <div class="upload-title">発注書・仕様書を添付してAI自動入力</div>
+              <input type="file" id="briefFile" />
+              <small>添付後は顧客名・案件名・工数・納期判断の下書きを自動作成する想定です。</small>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="preview-card">
+            <div class="card-title">AI判定プレビュー</div>
+            <div id="previewBox" class="empty-box small">必須項目入力後に、納期可否・担当者・外注判断を表示します。</div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" id="cancelOrderBtn">キャンセル</button>
+        <button class="btn btn-primary" id="saveOrderBtn">受注登録</button>
+      </div>
     </div>
-    <div class="hero-actions">
-      <button id="loadSampleBtn" class="secondary">サンプル読込</button>
-      <button id="downloadSampleBtn">サンプルテンプレートDL</button>
-    </div>
-  </header>
-
-  <main class="layout">
-    <section class="card form-card">
-      <h2>1. 発注テンプレート入力</h2>
-      <p class="section-desc">JSONファイルを読み込むか、下に直接入力してください。</p>
-      <div class="upload-row">
-        <input type="file" id="templateFile" accept=".json" />
-      </div>
-
-      <div class="grid">
-        <label>
-          顧客名
-          <input id="clientName" type="text" placeholder="例：チャッピー株式会社" />
-        </label>
-        <label>
-          案件名
-          <input id="projectName" type="text" placeholder="例：春のキャンペーンバナー" />
-        </label>
-        <label>
-          依頼種別
-          <select id="contentType">
-            <option value="banner">バナー</option>
-            <option value="lp">LP</option>
-            <option value="sns">SNS画像</option>
-            <option value="video">動画</option>
-            <option value="flyer">チラシ</option>
-            <option value="other">その他</option>
-          </select>
-        </label>
-        <label>
-          優先度
-          <select id="priority">
-            <option value="low">低</option>
-            <option value="medium" selected>中</option>
-            <option value="high">高</option>
-            <option value="urgent">緊急</option>
-          </select>
-        </label>
-        <label>
-          納期
-          <input id="dueDate" type="date" />
-        </label>
-        <label>
-          想定工数（時間）
-          <input id="estimatedHours" type="number" min="1" step="1" value="8" />
-        </label>
-        <label>
-          担当者名
-          <input id="assignee" type="text" placeholder="例：田中さん" />
-        </label>
-        <label>
-          担当者の1日作業可能時間
-          <input id="dailyCapacity" type="number" min="1" step="1" value="6" />
-        </label>
-        <label>
-          修正想定回数
-          <input id="revisionCount" type="number" min="0" step="1" value="2" />
-        </label>
-        <label>
-          外注可否
-          <select id="outsourceAllowed">
-            <option value="yes" selected>可</option>
-            <option value="no">不可</option>
-          </select>
-        </label>
-      </div>
-
-      <label class="full-width">
-        依頼内容・備考
-        <textarea id="details" rows="5" placeholder="例：Instagram広告用の春キャンペーンバナー。桜イメージ。女性向け。3サイズ必要。"></textarea>
-      </label>
-
-      <div class="actions">
-        <button id="analyzeBtn">2. 自動判定する</button>
-        <button id="resetBtn" class="ghost">リセット</button>
-      </div>
-    </section>
-
-    <section class="card results-card">
-      <h2>2. 自動判定結果</h2>
-      <div id="emptyState" class="empty-state">まだ判定していません。左側に入力して「自動判定する」を押してください。</div>
-      <div id="resultArea" class="hidden">
-        <div class="result-grid">
-          <div class="mini-card">
-            <h3>業務内容判定</h3>
-            <p id="taskCategory"></p>
-          </div>
-          <div class="mini-card">
-            <h3>納期判定</h3>
-            <p id="deadlineJudge"></p>
-          </div>
-          <div class="mini-card">
-            <h3>外注判断</h3>
-            <p id="outsourceJudge"></p>
-          </div>
-          <div class="mini-card">
-            <h3>必要日数</h3>
-            <p id="requiredDays"></p>
-          </div>
-        </div>
-
-        <div class="output-block">
-          <h3>自動作成された日報</h3>
-          <pre id="dailyReport"></pre>
-          <button class="small-btn" data-download="dailyReport">日報をDL</button>
-        </div>
-
-        <div class="output-block">
-          <h3>OK / NG 判定文</h3>
-          <pre id="okNgMessage"></pre>
-          <button class="small-btn" data-download="okNgMessage">判定文をDL</button>
-        </div>
-
-        <div class="output-block">
-          <h3>担当者通知文</h3>
-          <pre id="notificationText"></pre>
-          <button class="small-btn" data-download="notificationText">通知文をDL</button>
-        </div>
-
-        <div class="output-block">
-          <h3>外注指示書</h3>
-          <pre id="outsourceInstruction"></pre>
-          <button class="small-btn" data-download="outsourceInstruction">外注指示書をDL</button>
-        </div>
-
-        <div class="actions footer-actions">
-          <button id="downloadAllBtn">結果一式をJSONで保存</button>
-        </div>
-      </div>
-    </section>
-  </main>
-
-  <footer class="footer">
-    <p>※ この版はフロントエンドのみで動くため、メールの自動送信そのものは行いません。送信用の本文を自動生成し、ダウンロードできる形にしています。</p>
-  </footer>
+  </div>
 
   <script src="app.js"></script>
 </body>
