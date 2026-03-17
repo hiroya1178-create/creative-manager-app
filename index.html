@@ -4,14 +4,10 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>デザインマネージャー 完全更新版</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.3.136/pdf.min.mjs" type="module"></script>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="app-shell">
+  <div class="app">
     <aside class="sidebar">
       <div class="brand">
         <div class="brand-icon">✦</div>
@@ -20,132 +16,157 @@
           <div class="brand-sub">クリエイティブ管理</div>
         </div>
       </div>
-      <nav id="navMenu" class="nav-menu"></nav>
-      <div class="sidebar-footer">デザインマネージャー v2.0</div>
+      <nav id="nav"></nav>
+      <div class="version">デザインマネージャー v2.0</div>
     </aside>
 
-    <main class="main-panel">
+    <main class="main">
       <header class="topbar">
-        <div id="pageTitle" class="topbar-title">ダッシュボード</div>
-        <div class="topbar-actions">
-          <button id="sampleBtn" class="btn btn-light">サンプル30件作成</button>
+        <div id="pageTitle" class="page-title-small"></div>
+        <div class="top-actions">
+          <button id="sampleOneBtn" class="btn btn-light">サンプル1件追加</button>
           <button id="newOrderBtn" class="btn btn-primary">新規受注</button>
         </div>
       </header>
 
-      <section id="pageContent" class="page-content"></section>
+      <section id="dashboardPage" class="page"></section>
+      <section id="ordersPage" class="page hidden"></section>
+      <section id="templatesPage" class="page hidden"></section>
+      <section id="staffPage" class="page hidden"></section>
+      <section id="reportsPage" class="page hidden"></section>
+      <section id="outsourcePage" class="page hidden"></section>
     </main>
   </div>
 
-  <div id="modalBackdrop" class="modal-backdrop hidden">
-    <div class="modal" id="orderModal">
+  <div id="orderModal" class="modal hidden">
+    <div class="modal-card">
       <div class="modal-header">
-        <div>
-          <div class="modal-title">新規受注登録</div>
-          <div class="modal-sub">PDF読込 / 手入力 / AI判定プレビュー</div>
-        </div>
-        <button id="closeModalBtn" class="icon-btn">✕</button>
+        <h3>新規受注登録</h3>
+        <button id="closeOrderModal" class="icon-btn">✕</button>
       </div>
-      <div class="modal-body two-col">
-        <div class="modal-col scroll-col">
-          <div class="tab-row">
+      <div class="modal-body split">
+        <div class="pane">
+          <div class="tabs">
             <button class="tab active" data-tab="manual">手入力</button>
             <button class="tab" data-tab="pdf">PDF / 発注書読込</button>
           </div>
 
-          <div id="manualTab" class="tab-panel active">
+          <div id="pdfTab" class="tab-pane hidden">
+            <div class="upload-box">
+              <div class="upload-title">発注書・仕様書を添付してAI自動入力</div>
+              <div class="upload-row">
+                <span id="pickedFileName" class="muted">ファイルを選択（PDF推奨）</span>
+                <label class="btn btn-light">
+                  ファイルを選択
+                  <input id="pdfInput" type="file" accept=".pdf,.txt,.doc,.docx,.png,.jpg,.jpeg" hidden />
+                </label>
+              </div>
+              <div id="pdfMsg" class="msg hidden"></div>
+            </div>
+          </div>
+
+          <div id="manualTab" class="tab-pane">
             <div class="form-grid">
-              <label>顧客名 *<input id="fClient" type="text"></label>
-              <label>顧客メール *<input id="fClientEmail" type="email"></label>
-              <label>案件名 *<input id="fProjectName" type="text"></label>
-              <label>優先度
+              <label><span>顧客名 *</span><input id="fClient" type="text"></label>
+              <label><span>顧客メール</span><input id="fClientEmail" type="email"></label>
+              <label><span>案件名 *</span><input id="fProjectName" type="text"></label>
+              <label>
+                <span>優先度</span>
                 <select id="fPriority">
                   <option>通常</option>
                   <option>高</option>
                   <option>特急</option>
                 </select>
               </label>
-              <label>テンプレート *<select id="fTemplate"></select></label>
-              <label>受注金額<input id="fAmount" type="number"></label>
-              <label>納品形式<input id="fDeliverable" type="text" value="AI / PSD / PNG"></label>
-              <label>修正回数<input id="fRevisionCount" type="number" value="2"></label>
-              <label class="wide">発注詳細<textarea id="fDetails"></textarea></label>
-              <label>納期 *<input id="fDeadline" type="date"></label>
-              <label>社内メモ<input id="fMemo" type="text"></label>
-            </div>
-          </div>
-
-          <div id="pdfTab" class="tab-panel">
-            <div class="upload-box">
-              <div class="upload-title">発注書・仕様書を添付してAI自動入力</div>
-              <div class="upload-row">
-                <span id="pdfFileName">ファイルを選択（PDF推奨）</span>
-                <label class="btn btn-light upload-label">
-                  ファイルを選択
-                  <input id="pdfInput" type="file" accept=".pdf,.png,.jpg,.jpeg,.doc,.docx" hidden>
-                </label>
-              </div>
-              <div id="pdfMessage" class="hint">PDFから顧客名・案件名・詳細文の候補を自動反映します。</div>
+              <label>
+                <span>テンプレート *</span>
+                <select id="fTemplate"></select>
+              </label>
+              <label><span>受注金額</span><input id="fAmount" type="number"></label>
+              <label><span>納品形式</span><input id="fDeliverable" type="text" value="AI / PSD / PNG"></label>
+              <label><span>修正回数</span><input id="fRevisionCount" type="number" value="2"></label>
+              <label class="span2"><span>発注詳細</span><textarea id="fDetails" rows="5"></textarea></label>
+              <label><span>納期 *</span><input id="fDeadline" type="date"></label>
+              <label><span>社内メモ</span><input id="fMemo" type="text"></label>
             </div>
           </div>
         </div>
 
-        <div class="modal-col preview-col scroll-col">
-          <div class="preview-title">AI判定プレビュー</div>
-          <div id="previewBox" class="preview-box empty">必須項目入力後に、納期可否・担当者・外注判断を表示します。</div>
+        <div class="pane pane-side">
+          <div class="panel-title">AI判定プレビュー</div>
+          <div id="previewEmpty" class="preview-empty">顧客名・案件名・テンプレが入るとプレビュー開始。納期を入れると確定精度が上がります。</div>
+          <div id="previewBox" class="hidden">
+            <div class="mini-grid">
+              <div class="mini-card"><div class="mini-label">担当者</div><div id="pAssignee" class="mini-value"></div></div>
+              <div class="mini-card"><div class="mini-label">想定工数</div><div id="pEstimate" class="mini-value"></div></div>
+              <div class="mini-card"><div class="mini-label">判定</div><div id="pJudge" class="mini-value"></div></div>
+              <div class="mini-card"><div class="mini-label">完了見込み</div><div id="pFinish" class="mini-value"></div></div>
+            </div>
+            <div class="notice-wrap">
+              <div class="mini-label">通知文面</div>
+              <div id="pNotice" class="notice-box"></div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="modal-footer">
-        <button id="cancelModalBtn" class="btn btn-light">キャンセル</button>
-        <button id="saveOrderBtn" class="btn btn-primary">受注登録</button>
-      </div>
-    </div>
-
-    <div class="modal small hidden" id="staffModal">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title">スタッフ追加 / 編集</div>
-          <div class="modal-sub">担当者を追加できます</div>
+        <div id="submitHint" class="submit-hint">* 顧客名 / 案件名 / テンプレ / 納期 を入れると登録できます</div>
+        <div class="footer-actions">
+          <button id="cancelOrderBtn" class="btn btn-light">キャンセル</button>
+          <button id="saveOrderBtn" class="btn btn-primary" disabled>受注登録</button>
         </div>
-        <button id="closeStaffModalBtn" class="icon-btn">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-grid one-col">
-          <label>氏名<input id="sName" type="text"></label>
-          <label>役職<input id="sRole" type="text"></label>
-          <label>メール<input id="sEmail" type="email"></label>
-          <label>1日稼働時間<input id="sHoursPerDay" type="number" value="8"></label>
-          <label>現在稼働時間<input id="sBusyHours" type="number" value="0"></label>
-          <label>スキル（カンマ区切り）<input id="sSkills" type="text"></label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="cancelStaffBtn" class="btn btn-light">キャンセル</button>
-        <button id="saveStaffBtn" class="btn btn-primary">保存</button>
-      </div>
-    </div>
-
-    <div class="modal small hidden" id="receiveModal">
-      <div class="modal-header">
-        <div>
-          <div class="modal-title">外注完了案件を受信</div>
-          <div class="modal-sub">戻り案件を受信済みに変更</div>
-        </div>
-        <button id="closeReceiveModalBtn" class="icon-btn">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="form-grid one-col">
-          <label>受注番号<input id="rOrderId" type="text" placeholder="例: OD-1234"></label>
-          <label>受信メモ<textarea id="rMemo"></textarea></label>
-        </div>
-      </div>
-      <div class="modal-footer">
-        <button id="cancelReceiveBtn" class="btn btn-light">キャンセル</button>
-        <button id="saveReceiveBtn" class="btn btn-primary">受信登録</button>
       </div>
     </div>
   </div>
 
-  <script type="module" src="app.js"></script>
+  <div id="staffModal" class="modal hidden">
+    <div class="modal-card small">
+      <div class="modal-header">
+        <h3 id="staffModalTitle">スタッフ追加</h3>
+        <button id="closeStaffModal" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid single">
+          <label><span>氏名</span><input id="sName" type="text"></label>
+          <label><span>役職</span><input id="sRole" type="text"></label>
+          <label><span>メール</span><input id="sEmail" type="email"></label>
+          <label><span>1日稼働時間</span><input id="sHours" type="number" value="8"></label>
+          <label><span>スキル（カンマ区切り）</span><input id="sSkills" type="text"></label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div class="footer-actions">
+          <button id="cancelStaffBtn" class="btn btn-light">キャンセル</button>
+          <button id="saveStaffBtn" class="btn btn-primary">保存</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="receiveModal" class="modal hidden">
+    <div class="modal-card small">
+      <div class="modal-header">
+        <h3>外注完了案件を受信</h3>
+        <button id="closeReceiveModal" class="icon-btn">✕</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-grid single">
+          <label><span>受注番号</span><input id="rId" type="text" placeholder="例: OD-1234"></label>
+          <label><span>受信メモ</span><textarea id="rMemo" rows="4"></textarea></label>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div></div>
+        <div class="footer-actions">
+          <button id="cancelReceiveBtn" class="btn btn-light">キャンセル</button>
+          <button id="saveReceiveBtn" class="btn btn-primary">受信登録</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs" type="module"></script>
+  <script src="app.js" type="module"></script>
 </body>
 </html>
