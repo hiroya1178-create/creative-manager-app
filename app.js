@@ -1,5 +1,19 @@
+let pdfjsLibPromise = null;
+async function getPdfJs(){
+  if (window.pdfjsLib) return window.pdfjsLib;
+  if (pdfjsLibPromise) return pdfjsLibPromise;
+  pdfjsLibPromise = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.min.mjs')
+    .then((mod) => {
+      mod.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.worker.min.mjs';
+      return mod;
+    })
+    .catch((e) => {
+      console.error(e);
+      throw new Error('PDFライブラリの読込に失敗しました');
+    });
+  return pdfjsLibPromise;
+}
 
-import * as pdfjsLib from 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.5.136/pdf.min.mjs';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
 const STORAGE_KEY = "creative-manager-perfect-v4";
@@ -524,6 +538,7 @@ async function parsePdf(file){
   msg.classList.remove("hidden");
   msg.textContent = "PDFを解析中です...";
   try{
+    const pdfjsLib = await getPdfJs();
     const buf = await file.arrayBuffer();
     const pdf = await pdfjsLib.getDocument({data:buf}).promise;
     let text = "";
@@ -556,7 +571,11 @@ async function parsePdf(file){
     updatePreview();
   }catch(e){
     console.error(e);
-    msg.textContent = "PDFの読込に失敗しました。ファイル名は保持して手入力で続けられます。";
+    msg.textContent = "PDF本文の読込に失敗しました。ファイル名から案件名候補は反映できるので、そのまま不足分だけ入力してください。";
+    if(!$("#fProjectName").value) $("#fProjectName").value = file.name.replace(/\.pdf$/i,"").replace(/[_-]+/g," ");
+    if(!$("#fClient").value) $("#fClient").value = "未設定顧客";
+    if(!$("#fTemplate").value) $("#fTemplate").value = templates[0].id;
+    updatePreview();
   }
 }
 
