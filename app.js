@@ -1,18 +1,4 @@
-let pdfjsLibPromise = null;
-async function getPdfJs(){
-  if (window.pdfjsLib) return window.pdfjsLib;
-  if (pdfjsLibPromise) return pdfjsLibPromise;
-  pdfjsLibPromise = import('https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.min.mjs')
-    .then((mod) => {
-      mod.GlobalWorkerOptions.workerSrc = 'https://cdn.jsdelivr.net/npm/pdfjs-dist@4.5.136/build/pdf.worker.min.mjs';
-      return mod;
-    })
-    .catch((e) => {
-      console.error(e);
-      throw new Error('PDFライブラリの読込に失敗しました');
-    });
-  return pdfjsLibPromise;
-}
+if (window.pdfjsLib) { window.pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js'; }
 
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
 
@@ -538,9 +524,8 @@ async function parsePdf(file){
   msg.classList.remove("hidden");
   msg.textContent = "PDFを解析中です...";
   try{
-    const pdfjsLib = await getPdfJs();
     const buf = await file.arrayBuffer();
-    const pdf = await pdfjsLib.getDocument({data:buf}).promise;
+    const pdf = await window.pdfjsLib.getDocument({data:buf}).promise;
     let text = "";
     const maxPages = Math.min(pdf.numPages, 8);
     for(let i=1;i<=maxPages;i++){
